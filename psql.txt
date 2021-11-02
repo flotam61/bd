@@ -1,24 +1,56 @@
 chcp 1251
 
-psql -U postgres
+psql -U flores
+______________________________
 
-create table musician (id serial primary key, name varchar(32) not null, alias varchar(32) not null unique, albums varchar(32) not null, genre integer references genre(id))
-
-create table if not exists albums ( 
-	id serial primary key,
-	id_musician integer references musician(id),
-	name_album varchar(32) not null,
-	year integer not null,
-);
-
-create table if not exists track (
-	id serial primary key,
-	id_album integer references albums(id),
-	name_track varchar(56) not null,
-	duration numeric not null
-);
+CREATE DATABASE music
+    WITH 
+    OWNER = flores
 
 create table if not exists genre (
 	id serial primary key,
 	genre_name varchar(40)
+);
+
+create table if not exists musician (
+	id serial primary key, 
+	name varchar(32) not null, 
+	alias varchar(32) not null unique, 
+	genre integer
+);
+
+create table if not exists genre_musician (
+	id_musician integer references musician(id),
+	id_genre integer references genre(id)
+);
+
+create table if not exists albums (
+	id serial primary key,
+	id_musician integer,
+	name_albums varchar(40),
+	date_year integer
+);
+
+create table if not exists albums_musician (
+	id_musician integer references musician(id),
+	id_albums integer references albums(id)
+);
+
+create table if not exists track (
+	id serial primary key,
+	name_track varchar(56) not null,
+	id_albums integer references albums(id),
+	duration numeric not null,
+	id_sbor integer
+);
+
+create table if not exists sbor (
+	id serial primary key,
+	name_sbor varchar(40),
+	date_year integer
+);
+
+create table if not exists sbor_track (
+	id_sbor integer references sbor(id),
+	id_track integer references track(id)
 );
