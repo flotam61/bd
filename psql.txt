@@ -16,22 +16,22 @@ create table if not exists musician (
 	id serial primary key, 
 	name varchar(32) not null, 
 	alias varchar(32) not null unique, 
-	genre integer
 );
 
 create table if not exists genre_musician (
+	id serial primary key,
 	id_musician integer references musician(id),
 	id_genre integer references genre(id)
 );
 
 create table if not exists albums (
 	id serial primary key,
-	id_musician integer,
 	name_albums varchar(40),
 	date_year integer
 );
 
 create table if not exists albums_musician (
+	id serial primary key,
 	id_musician integer references musician(id),
 	id_albums integer references albums(id)
 );
@@ -41,7 +41,6 @@ create table if not exists track (
 	name_track varchar(56) not null,
 	id_albums integer references albums(id),
 	duration numeric not null,
-	id_sbor integer
 );
 
 create table if not exists sbor (
@@ -51,6 +50,7 @@ create table if not exists sbor (
 );
 
 create table if not exists sbor_track (
+	id serial primary key,
 	id_sbor integer references sbor(id),
 	id_track integer references track(id)
 );
