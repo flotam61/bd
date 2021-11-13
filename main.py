@@ -126,3 +126,68 @@ connection.execute("""SELECT name_track FROM track
 WHERE name_track LIKE '%%My%%';""").fetchall()
 
 
+connection.execute("""SELECT genre_name, COUNT(alias) FROM genre g
+JOIN genre_musician gm ON g.id = gm.id_genre
+JOIN musician m ON gm.id_musician = m.id
+GROUP BY g.genre_name""").fetchall()
+
+connection.execute("""SELECT t.name_track, a.date_year FROM albums a
+JOIN track t ON t.id_albums = a.id
+WHERE (a.date_year >= 2018) AND (a.date_year <= 2020)""").fetchall()
+
+connection.execute("""SELECT a.name_albums, AVG(t.duration) FROM albums a
+JOIN track t ON t.id_albums = a.id
+GROUP BY a.name_albums""").fetchall()
+
+connection.execute("""SELECT m.alias FROM musician m
+WHERE m.alias NOT IN (
+    SELECT m.alias FROM musician m
+    JOIN albums_musician am ON m.id = am.id_musician
+    JOIN albums a ON a.id = am.id_albums
+    WHERE a.date_year = 2018)""").fetchall()
+
+connection.execute("""SELECT s.name_sbor FROM sbor s
+JOIN sbor_track st ON s.id = st.id_sbor
+JOIN track t ON st.id_track = t.id
+JOIN albums a ON t.id_albums = a.id
+JOIN albums_musician am ON a.id = am.id_albums
+JOIN musician m ON am.id_musician = m.id
+WHERE m.alias LIKE '%%Eminem%%'
+""").fetchall()
+
+connection.execute("""SELECT a.name_albums FROM albums a
+JOIN albums_musician am ON a.id = am.id_albums
+JOIN musician m ON am.id_musician = m.id
+JOIN genre_musician gm ON m.id = gm.id_genre
+JOIN genre g ON g.id = gm.id_genre
+GROUP BY a.name_albums
+HAVING COUNT(DISTINCT g.genre_name) > 1
+""").fetchall()
+
+connection.execute("""SELECT t.name_track FROM track t
+JOIN sbor_track st ON t.id = st.id_track
+WHERE st.id_track IS NULL
+""").fetchall()
+
+connection.execute("""SELECT m.alias, t.duration FROM track t
+JOIN albums a ON a.id = t.id_albums
+JOIN albums_musician am ON am.id_albums = a.id
+JOIN musician m ON m.id = am.id_musician
+GROUP BY m.alias, t.duration
+HAVING t.duration = (SELECT MIN(duration) FROM track)
+""").fetchall()
+
+connection.execute("""SELECT a.name_albums FROM albums a
+JOIN track t ON t.id_albums = a.id
+WHERE t.id_albums IN (
+    SELECT id_albums FROM track
+    GROUP BY id_albums
+    HAVING COUNT(id) = (
+        SELECT COUNT(id) FROM track
+        GROUP BY id_albums
+        ORDER BY COUNT
+        LIMIT 1
+    )
+)
+ORDER BY a.name_albums
+""").fetchall()
